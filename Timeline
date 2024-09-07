@@ -1,0 +1,209 @@
+import React from 'react';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+const Header = ({ onBackPress }) => {
+  return (
+    <View style={styles.headerContainer}>
+      <TouchableOpacity onPress={onBackPress}>
+        <MaterialCommunityIcons name="arrow-left" size={24} color="black" />
+      </TouchableOpacity>
+      <Text style={styles.headerTitle}>Loan Status</Text>
+    </View>
+  );
+};
+
+const TimelineItem = ({ text, status, showNumber, isFirst }) => {
+  const statusStyles = {
+    done: styles.done,
+    inProgress: styles.inProgress,
+    notStarted: styles.notStarted,
+  };
+
+  const isBold = text === 'Loan Application' || text === 'Underwriting' || text === 'Sanction' || text === 'Documentation & Fees'|| text === 'Disbursement';
+
+  return (
+    <View style={styles.itemContainer}>
+      <View style={[styles.bullet, statusStyles[status], isFirst && styles.greenBullet]}>
+        {status === 'done' && <MaterialCommunityIcons name="check" size={20} color="white" />}
+        {status === 'inProgress' && (
+          <>
+            <View style={styles.whiteCircle} />
+            <View style={[styles.innerBullet, { backgroundColor: 'orange' }]}>
+              {showNumber && <Text style={styles.number}>{showNumber}</Text>}
+            </View>
+          </>
+        )}
+        {status === 'notStarted' && (
+          <>
+            <View style={styles.whiteCircle} />
+            <View style={[styles.innerBullet, { backgroundColor: 'white' }]}>
+              {showNumber && <Text style={styles.number}>{showNumber}</Text>}
+            </View>
+          </>
+        )}
+      </View>
+      <Text style={[styles.text, isBold && styles.boldText]}>{text}</Text>
+    </View>
+  );
+};
+
+const Timeline = ({ items }) => {
+  return (
+    <ScrollView style={styles.timelineContainer}>
+      <View style={styles.timeline}>
+        {items.map((item, index) => (
+          <View key={index} style={styles.timelineRow}>
+            <TimelineItem
+              text={item.text}
+              status={item.status}
+              showNumber={item.showNumber}
+              isFirst={index === 0}
+            />
+            {index < items.length - 1 && (
+              <View
+                style={[
+                  styles.verticalLine,
+                  item.status === 'done' && styles.orangeLine,
+                  index === 0 && styles.greenLine,
+                ]}
+              />
+            )}
+          </View>
+        ))}
+      </View>
+    </ScrollView>
+  );
+};
+
+const App = () => {
+  const handleBackPress = () => {
+    console.log('Back button pressed');
+  };
+
+  const stages = [
+    { text: 'Loan Application', status: 'notStarted', showNumber: 1 },
+    { text: 'Loan application filling', status: 'done' },
+    { text: 'Login fees collection', status: 'inProgress' },
+    { text: 'Loan Document Collection', status: 'notStarted' },
+    { text: 'Underwriting', status: 'notStarted', showNumber: 2 },
+    { text: 'Preliminary technical assessment', status: 'notStarted' },
+    { text: 'Details technical assessment', status: 'notStarted' },
+    { text: 'Proposal E-signing', status: 'notStarted' },
+    { text: 'Credit Assessment', status: 'notStarted' },
+    { text: 'Sanction', status: 'notStarted', showNumber: 3 },
+    { text: 'Sanction letter generated', status: 'notStarted' },
+    { text: 'Sanction letter sent to customer', status: 'notStarted' },
+    { text: 'Documentation & Fees', status: 'notStarted', showNumber: 4 },
+    { text: 'Loan agreement', status: 'notStarted' },
+    { text: 'Processing fees', status: 'notStarted' },
+    { text: 'Disbursement', status: 'notStarted', showNumber: 5 },
+  ];
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <Header onBackPress={handleBackPress} />
+      <Timeline items={stages} />
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    padding: 20,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginLeft: 10,
+  },
+  timelineContainer: {
+    flex: 1,
+  },
+  timeline: {
+    padding: 10,
+  },
+  itemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    position: 'relative',
+  },
+  bullet: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+    position: 'relative',
+  },
+  whiteCircle: {
+    position: 'absolute',
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: 'white',
+  },
+  innerBullet: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  text: {
+    fontSize: 16,
+  },
+  boldText: {
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  number: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  done: {
+    backgroundColor: 'green',
+  },
+  inProgress: {
+    backgroundColor: 'orange',
+  },
+  notStarted: {
+    backgroundColor: 'gray',
+  },
+  verticalLine: {
+    position: 'absolute',
+    width: 2,
+    backgroundColor: 'black',
+    top: 30,
+    bottom: 0,
+    left: 14,
+    zIndex: -1,
+  },
+  greenLine: {
+    backgroundColor: 'green',
+  },
+  orangeLine: {
+    backgroundColor: 'orange',
+  },
+  greenBullet: {
+    borderColor: 'green',
+    borderWidth: 2,
+  },
+  timelineRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
+  },
+});
+
+export default App;
